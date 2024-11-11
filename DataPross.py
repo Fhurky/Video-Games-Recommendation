@@ -28,4 +28,4 @@ for index, row in df_concat.iterrows():
             df_concat.at[index, category] = 0
 
 
-df_concat.to_csv('games_genres.csv', index=False)
+df_concat.to_csv('datasets/games_genres.csv', index=False)

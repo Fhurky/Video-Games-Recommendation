@@ -57,5 +57,5 @@ scaler = StandardScaler()
 scaler.fit(data[["original_price"]])
 data["original_price"] = scaler.transform(data[["original_price"]])
 
-data.to_csv('new_games_steam.csv', index=False)
+data.to_csv('datasets/new_games_steam.csv', index=False)
 

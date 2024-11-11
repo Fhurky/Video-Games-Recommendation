@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
 
-data = pd.read_csv("games_genres.csv", low_memory=False)
+data = pd.read_csv("datasets/games_genres.csv", low_memory=False)
 data_platfomrs = pd.read_csv(("games_platforms.csv"))
 
 data = data.loc[:, ~data.columns.str.contains('^Unnamed', na=False)]
