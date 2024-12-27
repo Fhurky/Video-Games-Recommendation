@@ -1,11 +1,9 @@
 import pandas as pd
+from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import NearestNeighbors
-from sklearn.cluster import DBSCAN, KMeans
 import os
 import joblib
-os.environ["LOKY_MAX_CPU_COUNT"] = "16"  # Mantıksal çekirdek sayısını belirtin
-
+os.environ["LOKY_MAX_CPU_COUNT"] = "8"  # Fiziksel çekirdek sayısını belirtin
 
 # Veri yükleme
 data = pd.read_csv("datasets/new_games_steam.csv")
@@ -38,39 +36,28 @@ X = data.drop(["name"], axis=1)
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# KNN ile benzer oyunları bulma
-knn = NearestNeighbors(n_neighbors=15, metric='cosine')
-knn.fit(X_scaled)
+# Gaussian Mixture Model ile kümeleme
+gmm = GaussianMixture(n_components=200, random_state=42)  # Küme sayısını ihtiyacınıza göre belirleyin
+gmm_clusters = gmm.fit_predict(X_scaled)
 
+# Veriye GMM küme etiketlerini ekleme
+data['gmm_cluster'] = gmm_clusters
+
+# Hedef oyun
 game_index = 37  # Örnek oyun indeksi
-game_index -=2
-distances, indices = knn.kneighbors([X_scaled[game_index]])
+target_gmm_cluster = data.loc[game_index, 'gmm_cluster']
 
-print(f"Benzer oyunlar {data['name'].iloc[game_index]} için (KNN):")
-for i in indices[0]:
-    print("-> " + data['name'].iloc[i])
+# Hedef kümede yer alan oyunlar
+similar_games_gmm = data[data['gmm_cluster'] == target_gmm_cluster]
 
-# KNN modelini kaydetme
-joblib.dump(knn, "knn_model.pkl")
-print("KNN modeli 'knn_model.pkl' olarak kaydedildi.")
+# 10 adet oyun seçme (örneğin, rastgele)
+similar_games_sample = similar_games_gmm.sample(10, random_state=42)
 
-# K-Means ile kümeleme
-kmeans = KMeans(n_clusters=4000, random_state=42)
-kmeans_clusters = kmeans.fit_predict(X_scaled)
-
-# Veriye K-Means küme etiketlerini ekleme
-data['kmeans_cluster'] = kmeans_clusters
-
-# Hedef oyunun K-Means kümesini bulma
-target_kmeans_cluster = data.loc[game_index, 'kmeans_cluster']
-
-similar_games_kmeans = data[data['kmeans_cluster'] == target_kmeans_cluster]
-print(f"Benzer oyunlar {data['name'].iloc[game_index]} için (K-Means):")
-for name in similar_games_kmeans['name']:
+# Önerilen oyunları yazdırma
+print(f"Benzer oyunlar {data['name'].iloc[game_index]} için (GMM, 10 adet):")
+for name in similar_games_sample['name']:
     print("-> " + name)
 
-# K-Means modelini kaydetme
-joblib.dump(kmeans, "kmeans_model.pkl")
-print("K-Means modeli 'kmeans_model.pkl' olarak kaydedildi.")
-
-
+# Modeli kaydet
+joblib.dump(gmm, "gmm_model.pkl")
+print("Model başarıyla kaydedildi.")
