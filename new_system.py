@@ -16,21 +16,6 @@ data = data.dropna(subset=['name'])
 # 'name' sütununu string'e çevir
 data['name'] = data['name'].astype(str)
 
-# Gerekli sütunları kaldırma
-columns_to_drop = [
-    "Grid-Based Movement", "Logic", "Pirates", "Tennis", "Faith", "Time Attack", "Motorbike",
-    "Hockey", "Tanks", "Nonlinear", "Kickstarter", "Building", "Sailing", "Solitaire",
-    "Intentionally Awkward Controls", "Psychological", "Dating Sim", "6DOF", "Top-Down Shooter",
-    "Web Publishing", "RTS", "Space Sim", "Capitalism", "Music-Based Procedural Generation",
-    "Hack and Slash", "Skating", "Memes", "Dynamic Narration", "Text-Based", "Clicker", "Noir",
-    "Cold War", "Martial Arts", "Lovecraftian", "Mystery Dungeon", "Hardware", "Nature",
-    "Lemmings", "Psychedelic", "Sniper", "Tutorial", "4 Player Local", "Mars", "Match 3",
-    "Dark Humor", "Audio Production", "Gun Customization", "Western", "Swordplay", "Real-Time",
-    "ATV", "Dinosaurs", "Ninja", "Tactical", "Alternate History", "Transhumanism", "Dog",
-    "Bikes", "Football"
-]
-data = data.drop(columns_to_drop, axis=1)
-
 # Model için veriyi hazırlama
 X = data.drop(["name"], axis=1)
 
